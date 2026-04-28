@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Bookings</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        <h2>Bookings for {{ hostel.name | upper}}</h2>
+        <div class="table-wrapper">
+            <table>
+                <tr>
+                    <th>Profile Picture</th>
+                    <th>Customer Name</th>
+                    <th>Phone Number</th>
+                    <th>Booking Date</th>
+                    <th>Status</th>
+                </tr>
+
+                {% set latest_bookings = {} %}
+                {% for booking in bookings | sort(attribute='created_at') %}
+                {% set latest_bookings = latest_bookings.update({booking.customer.id: booking}) or latest_bookings %}
+                {% endfor %}
+
+                {% for booking in bookings %}
+                <tr>
+                    <td>
+                        <img src="{{ url_for('static', filename='uploads/' + booking.customer.profile_picture) }}"
+                            alt="Customer Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
+                    </td>
+                    <td>{{ booking.customer.username | capitalize }}</td>
+                    <td>{{ booking.customer.phone_number }}</td>
+                    <td>{{ booking.created_at.strftime("%H:%M %d/%m/%Y") }}</td>
+                    <td>
+                        {% if booking == latest_bookings[booking.customer.id] and booking.status == "pending" %}
+                        {% if hostel.vacancies > 0 %}
+                        <form action="{{ url_for('hostel_bookings', hostel_id=hostel.id) }}" method="post"
+                            style="display:inline;">
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <input type="hidden" name="status" value="accepted">
+                            <button type="submit" class="book-button">Accept</button>
+                        </form>
+                        {% endif %}
+                        <form action="{{ url_for('hostel_bookings', hostel_id=hostel.id) }}" method="post"
+                            style="display:inline;">
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <input type="hidden" name="status" value="declined">
+                            <button type="submit" class="delete-button">Decline</button>
+                        </form>
+                        {% else %}
+                        {{ booking.status | capitalize }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                themeIcon.textContent = savedTheme === 'light-theme' ? '☀️' : '🌙';
+            }
+
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

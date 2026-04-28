@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Review</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="container">
+        <h2>Write a Review for {{ hostel.name | upper }}</h2>
+        <form method="POST">
+            <label for="rating">Rating (1-5):</label>
+            <select name="rating" required>
+                <option value="1">⭐</option>
+                <option value="2">⭐⭐</option>
+                <option value="3">⭐⭐⭐</option>
+                <option value="4">⭐⭐⭐⭐</option>
+                <option value="5">⭐⭐⭐⭐⭐</option>
+            </select><br>
+
+            <label for="comment">Comment:</label><br>
+            <textarea name="comment" required></textarea><br>
+
+            <button type="submit">Submit Review</button>
+        </form>
+        <a href="{{ url_for('dashboard') }}">Back</a>
+
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });</script>
+</body>
+
+
+</html>

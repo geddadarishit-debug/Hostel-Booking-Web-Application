@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* Ensure table cells wrap text */
+        table td {
+            max-width: 150px;
+            word-wrap: break-word;
+            white-space: normal;
+        }
+
+        /* Stack buttons vertically within table cells */
+        table td .btn {
+            display: block;
+            margin: 5px 0;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Style the table for better readability */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th,
+        table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+        }
+
+        /* Ensure form buttons (like Delete Hostel) also stack */
+        table td form {
+            display: block;
+            margin: 5px 0;
+        }
+
+        /* Search bar styling */
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            max-width: 230px;
+            align-items: center;
+        }
+
+        .search-container select,
+        .search-container input[type="text"] {
+            padding: 8px;
+            font-size: 14px;
+
+        }
+
+        .search-container option {
+            color: #D4AF37;
+        }
+
+        .search-container button {
+            size: 14px;
+            padding: 8px 16px;
+
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #D4AF37;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="dashboard-container">
+        <h2>Welcome, {{ current_user.username | capitalize }}</h2>
+
+        {% if current_user.user_type == "owner" %}
+        <a href="{{ url_for('add_hostel') }}" class="btn">Add Hostel</a>
+        <br><br>
+        {% endif %}
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <form method="GET" action="{{ url_for('dashboard') }}">
+                <select name="search_type">
+                    <option value="name">Search by Name</option>
+                    <option value="location">Search by Location</option>
+                </select>
+                <input type="text" name="query" placeholder="Enter search term"
+                    value="{{ request.args.get('query', '') }}">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Price</th>
+                {% if current_user.user_type == "customer" %}
+                <th>Status</th>
+                {% endif %}
+                {% if current_user.user_type == "owner" %}
+                <th>Bookings</th>
+                {% endif %}
+                <th>Actions</th>
+            </tr>
+            {% if current_user.user_type == "customer" %}
+            {% for hostel, booking in hostels_with_bookings %}
+            <tr>
+                <td>{{ hostel.name | upper }}</td>
+                <td>{{ hostel.location | capitalize }}</td>
+                </td>
+                <td>{{ hostel.price }}</td>
+                {% if booking %}
+                <td>{{ booking.status | capitalize }}
+                    <br>
+                    {% if hostel.vacancies > 0 %}
+                    Available
+                    {% else %}
+                    Not Available
+                    {% endif %}
+                </td>
+                {% elif hostel.vacancies>0 %}
+                <td>Available</td>
+                {% else %}
+                <td>Not Available</td>
+                {% endif %}
+                <td>
+                    {% if booking %}
+                    {% if booking.status == "pending" %}
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    {% elif booking.status == "accepted" %}
+                    <a href="{{ url_for('add_review', hostel_id=hostel.id) }}" class="btn">Your Review</a>
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    {% elif booking.status == "declined" or booking.status == "cancelled" %}
+                    {% if hostel.vacancies > 0 %}
+                    <a href="{{ url_for('book_hostel', hostel_id=hostel.id) }}" class="btn">Book Again</a>
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    {% else %}
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    {% endif %}
+                    {% else %}
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    {% endif %}
+                    {% else %}
+                    {% if hostel.vacancies > 0 %}
+                    <a href="{{ url_for('book_hostel', hostel_id=hostel.id) }}" class="btn">Book Now</a>
+                    {% else %}
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    {% endif %}
+                    {% endif %}
+                </td>
+
+            </tr>
+            {% endfor %}
+            {% else %}
+            {% for hostel in hostels %}
+            <tr>
+                <td>{{ hostel.name | upper }}</td>
+                <td>{{ hostel.location | capitalize }}</td>
+                <td>{{ hostel.price }}</td>
+                <td><a href="{{ url_for('hostel_accepted_bookings', hostel_id=hostel.id) }}" class="btn">{{
+                        hostel.accepted_bookings }}</a></td>
+                <td>
+                    <a href="{{ url_for('hostel_bookings', hostel_id=hostel.id) }}" class="btn">View Bookings</a>
+                    <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}" class="btn">View Details</a>
+                    <form action="{{ url_for('delete_hostel', hostel_id=hostel.id) }}" method="POST"
+                        style="display:inline;"
+                        onsubmit="return confirm('Are you sure you want to delete this hostel? This will remove all the data (images, bookings, reviews) and cannot be undone.');">
+                        <button type="submit" class="delete-button">Delete Hostel</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+        </table>
+
+        <a href="{{ url_for('logout') }}" class="btn">Logout</a>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>

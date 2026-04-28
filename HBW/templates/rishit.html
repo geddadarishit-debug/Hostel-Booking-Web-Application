@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rishit (31)</title>
+    <style>
+        body {
+            font-family: 'Helvetica', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #121212;
+        }
+
+        #showWorkBtn {
+            padding: 20px 40px;
+            font-size: 20px;
+            background-color: #1e90ff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(30, 144, 255, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #showWorkBtn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(30, 144, 255, 0.6);
+        }
+
+        #contribution {
+            margin-top: 30px;
+            padding: 25px 40px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #contribution.show {
+            opacity: 1;
+            transform: translateY(0);
+            animation: punchIn 0.8s ease-out;
+        }
+
+        @keyframes punchIn {
+            0% {
+                opacity: 0;
+                transform: translateY(50px) scale(0.95);
+            }
+
+            70% {
+                opacity: 1;
+                transform: translateY(-10px) scale(1.02);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .highlight {
+            color: #1e90ff;
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="showWorkBtn">My Work</button>
+    <div id="contribution">
+        <p>I handled the <span class="highlight">CSS styling</span> for this project.</p>
+    </div>
+
+    <script>
+        const button = document.getElementById('showWorkBtn');
+        const contribution = document.getElementById('contribution');
+
+        button.addEventListener('click', () => {
+            contribution.classList.toggle('show');
+        });
+    </script>
+</body>
+
+</html>

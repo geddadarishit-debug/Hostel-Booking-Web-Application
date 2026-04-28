@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yamuna (33)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1E90FF, #FF6A00);
+            color: white;
+            margin: 0;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .nav button {
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .nav button:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 900px;
+            margin-top: 20px;
+        }
+
+        .card {
+            width: 280px;
+            height: 200px;
+            background: linear-gradient(135deg, #ff512f, #dd2476);
+            border-radius: 15px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            cursor: pointer;
+            position: relative;
+            scroll-margin-top: 80px;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .card .description {
+            opacity: 0;
+            font-size: 14px;
+            font-weight: normal;
+            margin-top: 10px;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .card:hover .description {
+            opacity: 1;
+        }
+
+        .card:nth-child(1) {
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+        }
+
+        .card:nth-child(2) {
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+        }
+
+        .card:nth-child(3) {
+            background: linear-gradient(135deg, #ff6a00, #ee0979);
+        }
+
+        .card:nth-child(4) {
+            background: linear-gradient(135deg, #36d1dc, #5b86e5);
+        }
+
+        .card:nth-child(5) {
+            background: linear-gradient(135deg, #ff512f, #dd2476);
+        }
+
+        /* Active Card Highlight */
+        .card.active {
+            transform: scale(1.1);
+            box-shadow: 0px 10px 25px rgba(255, 255, 255, 0.7);
+            transition: all 0.4s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Figma-logo.svg" class="logo" alt="Figma Logo">
+        <h1>Figma Concepts</h1>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="nav">
+        <button onclick="scrollToCard(0)">Frames</button>
+        <button onclick="scrollToCard(1)">Components</button>
+        <button onclick="scrollToCard(2)">Auto Layout</button>
+        <button onclick="scrollToCard(3)">Prototyping</button>
+        <button onclick="scrollToCard(4)">Collaboration</button>
+    </div>
+
+    <!-- Figma Concepts -->
+    <div class="container">
+        <div class="card">
+            🎨 Frames
+            <div class="description">Frames are the foundation of your design, like artboards in Figma.</div>
+        </div>
+        <div class="card">
+            📦 Components
+            <div class="description">Components let you reuse elements to create consistent designs.</div>
+        </div>
+        <div class="card">
+            📐 Auto Layout
+            <div class="description">Auto Layout helps you create responsive, dynamic UI elements.</div>
+        </div>
+        <div class="card">
+            🔗 Prototyping
+            <div class="description">Link screens together to create interactive prototypes.</div>
+        </div>
+        <div class="card">
+            👥 Collaboration
+            <div class="description">Work with your team in real-time using Figma's collaboration tools.</div>
+        </div>
+    </div>
+
+    <script>
+        function scrollToCard(index) {
+            let cards = document.querySelectorAll('.card');
+
+            // Remove active class from all cards
+            cards.forEach(card => card.classList.remove('active'));
+
+            // Scroll to selected card
+            cards[index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+            // Add active class to highlight the selected card
+            setTimeout(() => {
+                cards[index].classList.add('active');
+            }, 300);
+        }
+    </script>
+
+</body>
+
+</html>

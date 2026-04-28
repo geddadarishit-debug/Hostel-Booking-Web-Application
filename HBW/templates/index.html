@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .home-container h1 {
+            color: rgb(54, 51, 51);
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="home-container">
+        <header>
+            <h1>Welcome to Hostel Booking</h1>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('login') }}">Get Started</a></li>
+                </ul>
+            </nav>
+        </header>
+        <section class="intro">
+            <h2>Find your ideal hostel with us</h2>
+            <p>Browse through our list of hostels and make your bookings easily.</p>
+        </section>
+        <footer>
+            <h2>Our Team</h2>
+            <h3>Contributors</h3>
+            <div class="team-members">
+                
+                <div class="team-member">
+                    <a href="{{ url_for('praneeth') }}" target="_blank">Praneeth</a>
+                </div>
+                <div class="team-member">
+                    <a href="{{ url_for('rishit') }}" target="_blank">Rishit</a>
+                </div>        
+            </div>
+            <h3>Members</h3>
+            <div class="team-members">
+                <div class="team-member">
+                    <p>Yamuna</p>
+                </div>
+                <div class="team-member">
+                    <p >Mahidar</p>
+                </div>
+                <div class="team-member">
+                    <p>Reshma</p>
+                </div>
+                <div class="team-member">
+                    <p>Dinesh</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('header, .intro, footer');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.3
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            const container = document.querySelector('.home-container');
+            const body = document.body;
+
+            document.addEventListener('mousemove', (e) => {
+                const { clientX, clientY } = e;
+                const { innerWidth, innerHeight } = window;
+
+                const xPos = (clientX / innerWidth - 0.5) * 20;
+                const yPos = (clientY / innerHeight - 0.5) * 20;
+
+                container.style.transform = `translateY(0) scale(1) perspective(1000px) rotateX(${-yPos / 2}deg) rotateY(${xPos / 2}deg)`;
+
+                body.style.setProperty('--mouse-x', `${xPos * 0.5}px`);
+                body.style.setProperty('--mouse-y', `${yPos * 0.5}px`);
+                body.querySelector('::before').style.transform = `translateZ(-1px) scale(1.1) translate(${xPos * 0.5}px, ${yPos * 0.5}px)`;
+                body.querySelector('::after').style.transform = `translateZ(-2px) scale(1.2) translate(${xPos * 0.7}px, ${yPos * 0.7}px)`;
+
+                container.querySelector('header h1').style.transform = `translateX(0) translate(${xPos * 0.2}px, ${yPos * 0.2}px)`;
+                container.querySelector('.intro h2').style.transform = `translateX(${xPos * 0.15}px)`;
+                container.querySelector('.intro p').style.transform = `translateY(0) translate(${xPos * 0.1}px, ${yPos * 0.1}px)`;
+                container.querySelector('footer p').style.transform = `translate(${xPos * 0.1}px, ${yPos * 0.1}px)`;
+            });
+
+            const flashes = document.querySelectorAll(".flash");
+            flashes.forEach(flash => {
+                flash.style.opacity = "0";
+                setTimeout(() => {
+                    flash.style.opacity = "1";
+                }, 10);
+
+                setTimeout(() => {
+                    flash.style.opacity = "0";
+                    setTimeout(() => {
+                        flash.classList.add("hidden");
+                    }, 500);
+                }, 3000);
+
+                const closeBtn = flash.querySelector(".close-btn");
+                if (closeBtn) {
+                    closeBtn.addEventListener("click", () => {
+                        flash.style.opacity = "0";
+                        setTimeout(() => {
+                            flash.classList.add("hidden");
+                        }, 500);
+                    });
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

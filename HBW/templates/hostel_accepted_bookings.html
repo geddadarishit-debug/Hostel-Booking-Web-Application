@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accepted Bookings for {{ hostel.name | upper}}</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        <h1>Accepted Bookings for {{ hostel.name | upper }}</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Profile Picture</th>
+                    <th>Customer</th>
+                    <th>Booking Date</th>
+                    <th>Status</th>
+                    <th>Action</th> <!-- New column for Remove button -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in accepted_bookings %}
+                <tr>
+                    <td><img src="{{ url_for('static', filename='uploads/' + booking.customer.profile_picture) }}"
+                            alt="Customer Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;"></td>
+                    <td>{{ booking.customer.username | capitalize }}</td>
+                    <td>{% if booking.accepted_date %}{{ booking.accepted_date.strftime("%H:%M %d/%m/%Y") }}{% else
+                        %}Not accepted{% endif %}</td>
+                    <td>{{ booking.status | capitalize }}</td>
+                    <td>
+                        <form method="post" action="{{ url_for('accepted_bookings', hostel_id=hostel.id) }}">
+                            <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                            <button type="submit" class="delete-button"
+                                onclick="return confirm('Are you sure you want to remove this booking?')">Remove</button>
+                        </form>
+
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                themeIcon.textContent = savedTheme === 'light-theme' ? '☀️' : '🌙';
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                body.classList.toggle('light-theme');
+                const newTheme = body.classList.contains('light-theme') ? 'light-theme' : 'dark-theme';
+                localStorage.setItem('theme', newTheme);
+                themeIcon.textContent = newTheme === 'light-theme' ? '☀️' : '🌙';
+            });
+        });
+    </script>
+</body>
+
+</html>

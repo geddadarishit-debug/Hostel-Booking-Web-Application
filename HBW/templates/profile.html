@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="container">
+        <h2>Your Profile</h2>
+        <p><strong>Username:</strong> {{ current_user.username | capitalize }}</p>
+        <p><strong>User Type:</strong> {{ current_user.user_type }}</p>
+        <p><strong>Phone Number:</strong> {{ current_user.phone_number or 'N/A' }}</p>
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            style="width: 100px; height: 100px; border-radius: 50%; margin: 10px 0;">
+
+        <form method="POST" enctype="multipart/form-data">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ current_user.username }}" required>
+
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" id="phone_number" name="phone_number" value="{{ current_user.phone_number or '' }}">
+
+            <label for="profile_picture">Change Profile Picture:</label>
+            <input type="file" id="profile_picture" name="profile_picture">
+
+            <button type="submit" name="update" class="btn">Update Profile</button>
+        </form>
+
+        {% if current_user.profile_picture != 'default_profile_picture_of_account.jfif' %}
+        <form method="POST"
+            onsubmit="return confirm('Are you sure you want to delete your profile picture? It will reset to the default image.');">
+            <button type="submit" name="delete_picture" class="delete-button">Delete Profile Picture</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('change_password') }}" class="btn">Change Password</a>
+        <form method="POST"
+            onsubmit="return confirm('Are you sure you want to delete your account? This will remove all your data (hostels, bookings, reviews) and cannot be undone.');">
+            <button type="submit" name="delete_account" class="delete-button">Delete Account</button>
+        </form>
+
+
+    </div><a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });</script>
+</body>
+
+</html>

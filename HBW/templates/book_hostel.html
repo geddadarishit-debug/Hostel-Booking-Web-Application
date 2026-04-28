@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Hostel</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="book-hostel-container">
+        <h2>Book Hostel</h2>
+
+        <div class="hostel-details">
+            <p><strong>Name:</strong> {{ hostel.name | upper}}</p>
+            <p><strong>Location:</strong> {{ hostel.location }}</p>
+            <p><strong>Price:</strong> {{ hostel.price }} per night</p>
+            <p><strong>Availability:</strong> {{ "Available" if hostel.availability else "Booked" }}</p>
+
+            {% if hostel.availability %}
+            <form action="{{ url_for('book_hostel', hostel_id=hostel.id) }}" method="POST">
+                <div>
+                    <label for="customer_name">Your Name:</label>
+                    <input type="text" id="customer_name" name="customer_name" value="{{ current_user.username }}"
+                        required>
+                </div>
+                <div>
+                    <label for="customer_phone">Your Phone Number:</label>
+                    <input type="text" id="customer_phone" name="customer_phone" value="{{ current_user.phone_number }}"
+                        required>
+                </div>
+                <button type="submit">Confirm Booking</button>
+            </form>
+            {% else %}
+            <p style="color: red;">This hostel is already booked.</p>
+            {% endif %}
+        </div>
+
+        <h3>Uploaded Images</h3>
+        <div class="image-gallery">
+            {% if hostel.images %}
+            {% set image_list = hostel.images.split(",") %}
+            {% for image in image_list %}
+            <div class="image-container">
+                <img src="{{ url_for('static', filename='uploads/' ~ image) }}" alt="Hostel Image" width="200">
+                {% if current_user.user_type == "owner" %}
+                <form action="{{ url_for('delete_image', hostel_id=hostel.id, image_name=image) }}" method="POST">
+                    <button type="submit" class="delete-button">Delete</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <p>No images uploaded yet.</p>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });</script>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="container">
+        <h2>Manage Bookings for {{ hostel.name}}</h2>
+        <table>
+            <tr>
+                <th>Profile Picture</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for booking in bookings %}
+            <tr>
+                <td><img src="{{ url_for('static', filename='uploads/' + booking.customer.profile_picture) }}"
+                        alt="Customer Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;"></td>
+                <td>{{ booking.customer.username }}</td>
+                <td>{{ booking.status }}</td>
+                <td>
+                    <form method="POST">
+                        <input type="hidden" name="booking_id" value="{{ booking.id }}">
+                        {% if booking.status == "pending" %}
+                        <button type="submit" name="action" value="accept">Accept</button>
+                        <button type="submit" name="action" value="decline">Decline</button>
+                        {% elif booking.status == "accepted" %}
+                        <span>Accepted</span>
+                        {% elif booking.status == "declined" %}
+                        <span>Declined</span>
+                        {% endif %}
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <a href="{{ url_for('hostel_details', hostel_id=hostel.id) }}">Back</a>
+
+    </div><a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });</script>
+</body>
+
+
+</html>

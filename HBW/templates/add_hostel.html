@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Hostel</title>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <button class="theme-switcher" aria-label="Toggle Theme">
+        <span class="theme-icon">🌙</span>
+    </button>
+
+    <a href="{{ url_for('profile') }}" class="profile-button" aria-label="Profile">
+        <img src="{{ url_for('static', filename='uploads/' + current_user.profile_picture) }}" alt="Profile Picture"
+            class="profile-img">
+    </a>
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}<button class="close-btn">X</button></div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+    <div class="add-hostel-container">
+        <h2>Add a New Hostel</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <div>@
+                <label for="name">Hostel Name:</label>
+                <input type="text" name="name" id="name" placeholder="Hostel Name" required>
+            </div>
+
+            <div>
+                <label for="location">Location:</label>
+                <input type="text" name="location" id="location" placeholder="Location" required>
+            </div>
+
+            <div>
+                <label for="price">Prices:</label>
+                <textarea name="price" id="price" rows="4" cols="50" placeholder="Enter prices for your hostel"
+                    required></textarea>
+            </div>
+            <div>
+                <label for="vacancies">Number of Vacancies:</label>
+                <input type="number" name="vacancies" min="0" required>
+
+            </div>
+            <div>
+                <label for="phone_number">Your Phone Number:</label>
+                <input type="text" name="phone_number" id="phone_number" placeholder="Your Phone Number" required
+                    value="{{current_user.phone_number}}">
+            </div>
+
+            <div>
+                <label for="images">Hostel Images:</label>
+                <input type="file" name="images" id="images" accept="image/*" multiple>
+            </div>
+
+            <div>
+                <label for="describe">Description:</label>
+                <textarea name="describe" id="describe" rows="6" cols="50" placeholder="Add description of your hostel"
+                    required></textarea>
+            </div>
+
+            <button type="submit">Add Hostel</button>
+        </form>
+
+        <a href="{{ url_for('dashboard') }}" class="btn">Back to Dashboard</a>
+
+    </div>
+    <a href="{{ url_for('dashboard') }}" class="home-button">Home</a>
+    <script>document.addEventListener('DOMContentLoaded', () => {
+            const themeSwitcher = document.querySelector('.theme-switcher');
+            const themeIcon = document.querySelector('.theme-icon');
+            const body = document.body;
+
+            // Load the saved theme from localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                body.classList.add(savedTheme);
+                if (savedTheme === 'light-theme') {
+                    themeIcon.textContent = '☀️';
+                } else {
+                    themeIcon.textContent = '🌙';
+                }
+            }
+
+            // Toggle theme on button click
+            themeSwitcher.addEventListener('click', () => {
+                if (body.classList.contains('light-theme')) {
+                    body.classList.remove('light-theme');
+                    localStorage.setItem('theme', 'dark-theme');
+                    themeIcon.textContent = '🌙';
+                } else {
+                    body.classList.add('light-theme');
+                    localStorage.setItem('theme', 'light-theme');
+                    themeIcon.textContent = '☀️';
+                }
+            });
+        });</script>
+</body>
+
+</html>
